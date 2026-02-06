@@ -1,6 +1,23 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+from PIL import Image
+st.title("AI Social Media Content Agent")
+
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+
+if not st.session_state.logged_in:
+    username = st.text_input("👤 Enter your name")
+    if st.button("Login"):
+        if username.strip() != "":
+            st.session_state.logged_in = True
+            st.session_state.username = username
+        else:
+            st.warning("Please enter your name")
+    st.stop()
+st.success(f"Welcome, {st.session_state.username} 👋")
+
 
 
 st.title(" AI Social Media Content Agent")
@@ -88,3 +105,38 @@ if st.button("Analyze Engagement"):
     plt.bar(df["Type"], df["Count"])
     plt.title("Engagement Breakdown")
     st.pyplot(plt)
+st.subheader("📊 Engagement Analyzer")
+
+likes = st.number_input("Likes", min_value=0)
+comments = st.number_input("Comments", min_value=0)
+shares = st.number_input("Shares", min_value=0)
+
+engagement_score = likes + (comments * 2) + (shares * 3)
+
+st.write(f"Engagement Score: **{engagement_score}**")
+
+if engagement_score < 50:
+    st.error("⚠️ Low Engagement Detected")
+
+    st.markdown("### 🔧 Suggested Improved Caption")
+    st.write("🔥 Don’t miss this! Double tap if you agree and share your thoughts below 👇")
+
+    st.markdown("### 🔧 Improved Hashtags")
+    st.write("#trending #viralpost #instagood #explore #contentcreator")
+
+else:
+    st.success("✅ Engagement looks good! Keep posting like this 👍")
+
+st.subheader("📷 Upload Image")
+
+uploaded_image = st.file_uploader(
+    "Upload an image for your post",
+    type=["jpg", "jpeg", "png"]
+)
+
+if uploaded_image:
+    image = Image.open(uploaded_image)
+    st.image(image, caption="Uploaded Image", use_column_width=True)
+
+    st.info("Suggested Caption based on image:")
+    st.write("✨ A moment worth sharing. Stay inspired and keep creating! ✨")
