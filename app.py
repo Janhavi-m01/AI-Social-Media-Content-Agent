@@ -107,25 +107,14 @@ if st.button("Analyze Engagement"):
     st.pyplot(plt)
 st.subheader("📊 Engagement Analyzer")
 
-likes = st.number_input("Likes", min_value=0)
-comments = st.number_input("Comments", min_value=0)
-shares = st.number_input("Shares", min_value=0)
+likes = st.number_input("Likes", min_value=0, key="likes_input")
+comments = st.number_input("Comments", min_value=0, key="comments_input")
+shares = st.number_input("Shares", min_value=0, key="shares_input")
 
 engagement_score = likes + (comments * 2) + (shares * 3)
 
 st.write(f"Engagement Score: **{engagement_score}**")
 
-if engagement_score < 50:
-    st.error("⚠️ Low Engagement Detected")
-
-    st.markdown("### 🔧 Suggested Improved Caption")
-    st.write("🔥 Don’t miss this! Double tap if you agree and share your thoughts below 👇")
-
-    st.markdown("### 🔧 Improved Hashtags")
-    st.write("#trending #viralpost #instagood #explore #contentcreator")
-
-else:
-    st.success("✅ Engagement looks good! Keep posting like this 👍")
 
 st.subheader("📷 Upload Image")
 
@@ -140,3 +129,4 @@ if uploaded_image:
 
     st.info("Suggested Caption based on image:")
     st.write("✨ A moment worth sharing. Stay inspired and keep creating! ✨")
+
