@@ -2,131 +2,161 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 from PIL import Image
-st.title("AI Social Media Content Agent")
+import io
+
+# -------------------- LOGIN --------------------
+st.set_page_config(page_title="AI Social Media Agent", page_icon="🤖")
+
+st.title("🤖 AI Social Media Content Agent")
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
 if not st.session_state.logged_in:
-    username = st.text_input("👤 Enter your name")
-    if st.button("Login"):
-        if username.strip() != "":
+    username = st.text_input("👤 Enter your name", key="login_name")
+    if st.button("Login 🚀"):
+        if username.strip():
             st.session_state.logged_in = True
             st.session_state.username = username
         else:
-            st.warning("Please enter your name")
+            st.warning("⚠️ Please enter your name")
     st.stop()
+
 st.success(f"Welcome, {st.session_state.username} 👋")
+st.markdown("---")
 
+# -------------------- CONTENT GENERATOR --------------------
+st.header("📝 Content Generator")
 
-
-st.title(" AI Social Media Content Agent")
-st.write("Create captions, hashtags & posting strategy for FREE!")
-
-topic = st.text_input("Enter your post topic:")
-platform = st.selectbox("Choose platform", ["Instagram", "LinkedIn", "Twitter"])
-tone = st.selectbox("Choose tone", ["Casual", "Professional", "Funny"])
+topic = st.text_input("💡 Enter your post topic", key="topic")
+platform = st.selectbox("📱 Platform", ["Instagram", "LinkedIn", "Twitter"])
+tone = st.selectbox("🎭 Tone", ["Casual", "Professional", "Funny"])
 
 def generate_caption(topic, tone):
     if tone == "Casual":
-        return f"Just vibing with {topic}  Stay tuned!"
+        return f"✨ Just vibing with **{topic}** — stay tuned! 😎"
     elif tone == "Professional":
-        return f"Introducing {topic}. Focused on growth and consistency."
-    elif tone == "Funny":
-        return f"{topic} but make it legendary "
-
-if st.button("Generate Caption"):
-    if topic:
-        st.success(generate_caption(topic, tone))
+        return f"🚀 Exploring **{topic}** with focus, growth & consistency."
     else:
-        st.warning("Please enter a topic first.")
-st.subheader(" Hashtag Generator")
+        return f"😂 {topic} but make it legendary! Who relates? 👀🔥"
 
 def generate_hashtags(topic, platform):
-    clean_topic = topic.replace(" ", "").lower()
-
+    clean = topic.replace(" ", "").lower()
     if platform == "Instagram":
-        return f"#{clean_topic} #instagood #contentcreator #reels #trending"
+        return f"#{clean} #reels #instagrowth #creatorlife #trending 🔥"
     elif platform == "LinkedIn":
-        return f"#{clean_topic} #professional #careergrowth #linkedinindia"
+        return f"#{clean} #careergrowth #professional #linkedinindia 💼"
     else:
-        return f"#{clean_topic} #twitter #dailycontent #trends"
+        return f"#{clean} #twitter #dailycontent #techtrends 🧠"
 
-if st.button("Generate Hashtags"):
+caption = ""
+hashtags = ""
+
+if st.button("✨ Generate Content"):
     if topic:
-        st.info(generate_hashtags(topic, platform))
+        caption = generate_caption(topic, tone)
+        hashtags = generate_hashtags(topic, platform)
+        st.success(caption)
+        st.info(hashtags)
     else:
-        st.warning("Please enter a topic first.")
+        st.warning("⚠️ Please enter a topic")
 
-st.subheader(" Best Posting Time")
+# -------------------- POSTING TIME --------------------
+st.markdown("---")
+st.header("⏰ Best Posting Time")
 
-def suggest_posting_time(platform):
-    if platform == "Instagram":
-        return "📈 Best time: 7 PM – 9 PM (High engagement)"
-    elif platform == "LinkedIn":
-        return "📈 Best time: 8 AM – 10 AM (Professional hours)"
-    else:
-        return "📈 Best time: 12 PM – 1 PM (Peak scrolling time)"
+def suggest_time(platform):
+    return {
+        "Instagram": "📈 7 PM – 9 PM (High engagement)",
+        "LinkedIn": "📈 8 AM – 10 AM (Professional hours)",
+        "Twitter": "📈 12 PM – 1 PM (Peak scroll time)"
+    }[platform]
 
-if st.button("Suggest Posting Time"):
-    st.success(suggest_posting_time(platform))
-st.subheader("📊 Engagement Analyzer")
+st.success(suggest_time(platform))
 
-likes = st.number_input("Likes", min_value=0)
-comments = st.number_input("Comments", min_value=0)
-shares = st.number_input("Shares", min_value=0)
+# -------------------- IMAGE UPLOAD --------------------
+st.markdown("---")
+st.header("📷 Smart Image Captioning")
 
-def analyze_engagement(likes, comments, shares):
-    score = likes + (comments * 2) + (shares * 3)
+uploaded_image = st.file_uploader("Upload post image", type=["jpg", "jpeg", "png"])
 
-    if score >= 100:
-        return score, "🔥 Excellent engagement! Keep the same content style."
-    elif score >= 50:
-        return score, "👍 Good engagement. Try adding emojis or a question."
-    else:
-        return score, "😕 Low engagement. Improve caption and posting time."
-
-if st.button("Analyze Engagement"):
-    score, feedback = analyze_engagement(likes, comments, shares)
-
-    st.write(f"📌 Engagement Score: **{score}**")
-    st.info(feedback)
-
-    # Graph
-    data = {
-        "Likes": likes,
-        "Comments": comments,
-        "Shares": shares
-    }
-
-    df = pd.DataFrame(list(data.items()), columns=["Type", "Count"])
-
-    plt.figure()
-    plt.bar(df["Type"], df["Count"])
-    plt.title("Engagement Breakdown")
-    st.pyplot(plt)
-st.subheader("📊 Engagement Analyzer")
-
-likes = st.number_input("Likes", min_value=0, key="likes_input")
-comments = st.number_input("Comments", min_value=0, key="comments_input")
-shares = st.number_input("Shares", min_value=0, key="shares_input")
-
-engagement_score = likes + (comments * 2) + (shares * 3)
-
-st.write(f"Engagement Score: **{engagement_score}**")
-
-
-st.subheader("📷 Upload Image")
-
-uploaded_image = st.file_uploader(
-    "Upload an image for your post",
-    type=["jpg", "jpeg", "png"]
-)
+smart_caption = ""
 
 if uploaded_image:
     image = Image.open(uploaded_image)
     st.image(image, caption="Uploaded Image", use_column_width=True)
 
-    st.info("Suggested Caption based on image:")
-    st.write("✨ A moment worth sharing. Stay inspired and keep creating! ✨")
+    # Smart rule-based caption
+    if platform == "Instagram":
+        smart_caption = "📸 Every picture tells a story — what’s yours? ✨👇"
+    elif platform == "LinkedIn":
+        smart_caption = "📊 Visuals that reflect growth, learning & professionalism."
+    else:
+        smart_caption = "👀 This image says more than words. What do you think?"
 
+    st.info("🧠 Smart Caption Suggestion")
+    st.write(smart_caption)
+
+# -------------------- ENGAGEMENT ANALYZER --------------------
+st.markdown("---")
+st.header("📊 Engagement Analyzer")
+
+likes = st.number_input("👍 Likes", min_value=0)
+comments = st.number_input("💬 Comments", min_value=0)
+shares = st.number_input("🔁 Shares", min_value=0)
+
+def analyze(l, c, s):
+    score = l + (c * 2) + (s * 3)
+    if score >= 100:
+        return score, "🔥 Excellent engagement!"
+    elif score >= 50:
+        return score, "👍 Good engagement. Add CTA or emojis."
+    else:
+        return score, "⚠️ Low engagement – improvement needed."
+
+if st.button("Analyze Engagement 📊"):
+    score, msg = analyze(likes, comments, shares)
+    st.write(f"📌 Engagement Score: **{score}**")
+    st.info(msg)
+
+    if score < 50:
+        st.error("🔧 AI Improvement Suggestions")
+        st.write("🔥 **Improved Caption:**")
+        st.write("Don’t just scroll — react ❤️, comment 💬, and share 🔁!")
+        st.write("🚀 **Improved Hashtags:**")
+        st.write("#viral #explore #engagementboost #contentcreator #techai 🤖")
+
+    df = pd.DataFrame({
+        "Metric": ["Likes", "Comments", "Shares"],
+        "Count": [likes, comments, shares]
+    })
+
+    fig, ax = plt.subplots()
+    ax.bar(df["Metric"], df["Count"])
+    ax.set_title("Engagement Breakdown")
+    st.pyplot(fig)
+
+# -------------------- DOWNLOAD BUTTON --------------------
+st.markdown("---")
+st.header("⬇️ Download Content")
+
+download_text = f"""
+CAPTION:
+{caption or smart_caption}
+
+HASHTAGS:
+{hashtags}
+
+Generated using AI Social Media Content Agent 🤖
+"""
+
+buffer = io.BytesIO()
+buffer.write(download_text.encode())
+buffer.seek(0)
+
+st.download_button(
+    label="📥 Download Caption & Hashtags",
+    data=buffer,
+    file_name="social_media_content.txt",
+    mime="text/plain"
+)
